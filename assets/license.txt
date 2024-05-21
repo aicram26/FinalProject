@@ -1,0 +1,11 @@
+Model Information:
+* title:	pacman 3d
+* source:	https://sketchfab.com/3d-models/pacman-3d-cce02e2817e94135b83f3a624f9fa7e9
+* author:	phamducphuc94 (https://sketchfab.com/ducphuc194)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "pacman 3d" (https://sketchfab.com/3d-models/pacman-3d-cce02e2817e94135b83f3a624f9fa7e9) by phamducphuc94 (https://sketchfab.com/ducphuc194) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,47 @@
+html{
+    /* background-color: black; */
+    #gradient-canvas {
+        width:100%;
+        height:100%;
+        --gradient-color-1: #b7a24c; 
+        --gradient-color-2: #80394f; 
+        --gradient-color-3: #655d54;  
+        --gradient-color-4: #568033;
+      }
+}
+h1{
+    color: white;
+    text-align: center;
+}
+
+canvas {
+    
+ position:absolute;
+ top:0;
+ left:0;
+}
+
+#play-button{
+    visibility: hidden;
+}
+#playl-button{
+    visibility: visible;
+   
+}
+
+ #scene-container{
+    width: 90vw;
+    height: 90vh;
+    padding: 0;
+    margin: 0 5%;
+    position: absolute;
+
+}
+         
+ body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background: black;
+    overflow: hidden;
+  } 

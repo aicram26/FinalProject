@@ -1,90 +1,184 @@
-let scene, camera, renderer, ufo, mixer, front, back, left, right, top, bottom, poem, poemMesh,Cube, ambient, directionalLight, container;
 
 
-// Basic Three.JS scene from documentation, importing Three.JS through a CDN 
-// https://threejs.org/docs/#manual/en/introduction/Creating-a-scene
+	let container, stats, camera, scene, renderer, controls, front, back, left, right, top, bottom,videoMesh  ;
 
 
-//~~~~~~~Import Three.js (also linked to as import map in HTML)~~~~~~
+
 import * as THREE from 'three';
+            
+            //trial
+
+            import { Gradient } from './Gradient.js'
+			// Create your instance
+            const gradient = new Gradient()
+
+            // Call `initGradient` with the selector to your canvas
+            gradient.initGradient('#gradient-canvas')
+
+			let sceneContainer = document.querySelector("#scene-container")
+            
+            //end trial
+            
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
+			import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
+
+			// let container, stats;
+
+			// let camera, scene, renderer;
+			// let controls;
+
+			const clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 40, sceneContainer.clientWidth / sceneContainer.clientHeight, 1, 15000 );
+				// camera.position.z = 3;
+				// camera.position.x = 3;
+
+				// scene
+
+				scene = new THREE.Scene();
+				//  scene.background = new THREE.Color().setHSL( 0.51, 0.4, 0.01, THREE.SRGBColorSpace );
+				//  scene.fog = new THREE.Fog( scene.background, 3500, 15000 );
+
+				// world
+
+				const s = 250;
+
+				const geometry = new THREE.BoxGeometry( s, s, s );
+				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 5, } );
+
+				for ( let i = 0; i < 300; i ++ ) {
+
+					const mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
+					mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
+					mesh.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
+
+					mesh.rotation.x = Math.random() * Math.PI;
+					mesh.rotation.y = Math.random() * Math.PI;
+					mesh.rotation.z = Math.random() * Math.PI;
+
+					mesh.matrixAutoUpdate = false;
+					mesh.updateMatrix();
+
+					scene.add( mesh );
+
+				}
 
 
+				// lights
 
-// Import add-ons
-import { OrbitControls } from 'https://unpkg.com/three@0.162.0/examples/jsm/controls/OrbitControls.js';
- 
-import { GLTFLoader } from 'https://unpkg.com/three@0.162.0/examples/jsm/loaders/GLTFLoader.js'; // to load 3d models
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.15 );
+				dirLight.position.set( 0, - 1, 0 ).normalize();
+				dirLight.color.setHSL( 0.1, 0.7, 0.5 );
+				scene.add( dirLight );
 
-import { Gradient } from './Gradient.js'
+				// lensflares
+				const textureLoader = new THREE.TextureLoader();
 
-// Create your instance
-const gradient = new Gradient()
+				const textureFlare0 = textureLoader.load( 'textures/lensflare0.png' );
+				const textureFlare3 = textureLoader.load( 'textures/lensflare3.png' );
 
-// Call `initGradient` with the selector to your canvas
-gradient.initGradient('#gradient-canvas')
+				addLight( 0.55, 0.9, 0.5, 5000, 0, - 1000 );
+				addLight( 0.08, 0.8, 0.5, 0, 0, - 1000 );
+				addLight( 0.995, 0.5, 0.9, 5000, 5000, - 1000 );
 
-let sceneContainer = document.querySelector("#scene-container")
+				function addLight( h, s, l, x, y, z ) {
 
+					const light = new THREE.PointLight( 0xffffff, 1.5, 2000, 0 );
+					light.color.setHSL( h, s, l );
+					light.position.set( x, y, z );
+					scene.add( light );
 
-function init() {
-    scene = new THREE.Scene();
-    // scene.background = new THREE.TextureLoader()
-      
-    // trial
-    // container = document.createElement( 'div' );
-	// document.body.appendChild( container );
+					const lensflare = new Lensflare();
+					lensflare.addElement( new LensflareElement( textureFlare0, 700, 0) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 60, 0.6));
+					lensflare.addElement( new LensflareElement( textureFlare3, 70, 0.7) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 120, 0.9) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 70, 1) );
+					light.add( lensflare );
 
-    ;// ~~~~~~~~~~~~~~~~Create scene here~~~~~~~~~~~~~~~~
+				}
 
-    
-const light = new THREE.DirectionalLight(0xffffff,3);
-light.position.set(3,4,5);
-scene.add(light);
+				// renderer
+                const renderContainer = document.createElement('div');
+                sceneContainer.appendChild(renderContainer);
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha:true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( sceneContainer.clientWidth, sceneContainer.clientHeight );
+				sceneContainer.appendChild( renderer.domElement );
 
-const lightLeft = new THREE.DirectionalLight(0xffffff,3);
-light.position.set(-3,4,5);
-scene.add(lightLeft);
+				//Controls
 
-camera = new THREE.PerspectiveCamera(
-    70, //set field of view
-    sceneContainer.clientWidth / sceneContainer.clientHeight, //set aspect ratio
-    0.01,  //set camera for near plane
-    3000 //set camera for far plane
-);
+				controls = new FlyControls( camera, renderer.domElement );
 
-renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
-sceneContainer.appendChild(renderer.domElement);
+				controls.movementSpeed = 100;
+				controls.domElement = sceneContainer;
+				controls.rollSpeed = Math.PI / 9;
+				controls.autoForward = false;
+				controls.dragToLook = false;
 
-// ~~~~~~~~~~~~~~~~ Initiate add-ons ~~~~~~~~~~~~~~~~
-const controls = new OrbitControls(camera, renderer.domElement);
-const loader = new GLTFLoader(); // to load 3d models
+				// stats
 
-let mixer;
-    loader.load('assets/ufo.gltf',function (gltf){
-        ufo =gltf.scene;
-        scene.add(ufo);
-        ufo.scale.set(2,2,2);
-        ufo.position.set(0, -15, 0);
-        ufo.rotation.y += 0.01;
-        mixer = new THREE.AnimationMixer(ufo); 
-        const clips = gltf.animations;
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-        clips.forEach(function (clip) {
-           const action = mixer.clipAction(clip); 
-             action.play(); 
-        });
-})
-// →→→→→→ Follow next steps in tutorial: // https://threejs.org/docs/#manual/en/introduction/Creating-a-scene
+				// events
 
+				window.addEventListener( 'resize', onWindowResize );
 
-front
+             
+				//trial cube
+				front
 const frontLoader = new THREE.TextureLoader();
 front = frontLoader.load('./textures/front.png');
 const frontMaterial = new THREE.MeshBasicMaterial({ map: front, transparent: true });
-const frontGeometry = new THREE.BoxGeometry(20, 20, 0);
+const frontGeometry = new THREE.BoxGeometry(200, 200, 0);
 const frontMesh = new THREE.Mesh(frontGeometry, frontMaterial);
-frontMesh.position.set(0, 0, -10);
+frontMesh.position.set(0, 0, -100);
+
+let video = document.getElementById('video'); //link video HTML to javascript
+
+const videoElement = document.getElementById('video');
+  const muteButton = document.getElementById('mute-button');
+
+  videoElement.muted = false;
+
+  muteButton.addEventListener('click', toggleMute);
+
+  function toggleMute() {
+	videoElement.muted = !videoElement.muted;
+	if (videoElement.muted) {
+	  muteButton.textContent = 'Unmute';
+	} else {
+	  muteButton.textContent = 'Mute';
+	}
+  }
+  
+
+
+let videoTexture = new THREE.VideoTexture(video); // create exture for 
+const videoLoader = new THREE.TextureLoader();
+
+video = videoLoader.load('./media/outside.mp4');
+const videoMaterial = new THREE.MeshBasicMaterial({map:videoTexture});
+const videoGeometry = new THREE.BoxGeometry(0,200,200);
+videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+videoMesh.position.set(101,0,0);
+scene.add(videoMesh);
+
 scene.add(frontMesh);
 
 
@@ -92,36 +186,69 @@ scene.add(frontMesh);
  const backLoader = new THREE.TextureLoader();
  back = backLoader.load('./textures/back.png');
  const backMaterial = new THREE.MeshBasicMaterial({ map: back, transparent: true });
- const backGeometry = new THREE.BoxGeometry(20, 20, 0); 
+ const backGeometry = new THREE.BoxGeometry(200, 200, 0); 
  const backMesh = new THREE.Mesh(backGeometry, backMaterial);
- backMesh.position.set(0, 0, 10);
+ backMesh.position.set(0, 0, 100);
+
+ video = videoLoader.load('./media/outside.mp4');
+ videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+ videoMesh.position.set(-99,0,0);
+ scene.add(videoMesh);
+
  scene.add(backMesh);
 
 //left
 const leftLoader = new THREE.TextureLoader();
 left = leftLoader.load('./textures/left.png');
 const leftMaterial = new THREE.MeshBasicMaterial({ map: left, transparent: true });
-const leftGeometry = new THREE.BoxGeometry(0, 20, 20);
+const leftGeometry = new THREE.BoxGeometry(0, 200, 200);
 const leftMesh = new THREE.Mesh(leftGeometry, leftMaterial);
-leftMesh.position.set(-10, 0, 0);
+leftMesh.position.set(-100, 0, 0);
+
+
+// let video = document.getElementById('video'); //link video HTML to javascript
+// let videoTexture = new THREE.VideoTexture(video); // create exture for 
+// const videoLoader = new THREE.TextureLoader();
+video = videoLoader.load('./media/outside.mp4');
+// const videoMaterial = new THREE.MeshBasicMaterial({map:videoTexture});
+// const videoGeometry = new THREE.BoxGeometry (200,200,0);
+videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+videoMesh.position.set(0,0,101);
+videoMesh.rotation.y = Math.PI / 2;
+
+scene.add(videoMesh);
+
 scene.add(leftMesh);
 
 //right
 const rightLoader = new THREE.TextureLoader();
 right = rightLoader.load('./textures/right.png');
 const rightMaterial = new THREE.MeshBasicMaterial({ map: right, transparent: true });
-const rightGeometry = new THREE.BoxGeometry(0, 20, 20);
+const rightGeometry = new THREE.BoxGeometry(0, 200, 200);
 const rightMesh = new THREE.Mesh(rightGeometry, rightMaterial);
-rightMesh.position.set(10, 0, 0);
+rightMesh.position.set(100, 0, 0);
+
+
+// let video = document.getElementById('video'); //link video HTML to javascript
+// let videoTexture = new THREE.VideoTexture(video); // create exture for 
+// const videoLoader = new THREE.TextureLoader();
+video = videoLoader.load('./media/outside.mp4');
+// const videoMaterial = new THREE.MeshBasicMaterial({map:videoTexture});
+// const videoGeometry = new THREE.BoxGeometry (200,200,0);
+videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+videoMesh.position.set(0,0,-99);
+videoMesh.rotation.y = Math.PI / 2;
+scene.add(videoMesh);
+
 scene.add(rightMesh);
 
  //bottom 
  const bottomLoader = new THREE.TextureLoader();
  bottom = bottomLoader.load('./textures/bottom.png');
  const bottomMaterial = new THREE.MeshBasicMaterial({ map: bottom, transparent: true });
- const bottomGeometry = new THREE.BoxGeometry(20, 0, 20);
+ const bottomGeometry = new THREE.BoxGeometry(200, 0, 200);
  const bottomMesh = new THREE.Mesh(bottomGeometry, bottomMaterial);
- bottomMesh.position.set(0, -10, 0); 
+ bottomMesh.position.set(0, -100, 0); 
 
  scene.add(bottomMesh);
 
@@ -129,55 +256,54 @@ scene.add(rightMesh);
   const topLoader = new THREE.TextureLoader();
   top = topLoader.load('./textures/top.png');
   const topMaterial = new THREE.MeshBasicMaterial({ map: top, transparent: true });
-  const topGeometry = new THREE.BoxGeometry(20, 0, 20);
+  const topGeometry = new THREE.BoxGeometry(200, 0, 200);
   const topMesh = new THREE.Mesh(topGeometry, topMaterial);
-  topMesh.position.set(0, 10, 0); // x, y, z
+  topMesh.position.set(0, 100, 0); // x, y, z
+
   scene.add(topMesh);
 
-  //add poem
-  const poemLoader = new THREE.TextureLoader();
-  poem = poemLoader.load('./textures/poem.png');
-  const poemMaterial = new THREE.MeshBasicMaterial({ map: poem, transparent: true });
-  const poemGeometry = new THREE.BoxGeometry(0, 1, 1);
-  poemMesh = new THREE.Mesh(poemGeometry, poemMaterial);
-  poemMesh.position.set(5, 0, 0);
-  scene.add(poemMesh);
 
-camera.position.z = 3;
-camera.position.x = 3;
-// controls.update();
-}
 
-// end trial
+ 
 
-function animate() {
-//  if (mixer)
-//     mixer.update(clock.getDelta());
-   
-    // cube.rotation.x += 0.01;
-    // cube.rotation.y += 0.01;
+  camera.position.z = 3;
+  camera.position.x = 3;
+			}
 
-    poemMesh.rotation.y = 190;
-    poemMesh.scale.set(5,5,5);
 
-    if (ufo){
-        ufo.rotation.y = Math.sin(Date.now() / 1000) * .5;
-    }
 
-    renderer.render( scene, camera );
-    requestAnimationFrame( animate );
-}
+			//
 
-function onWindowResize() {
-    camera.aspect = sceneContainer.clientWidth / sceneContainer.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+			function onWindowResize() {
 
-     window = window.innerWidth ;
-	 window = window.innerHeight;
+				renderer.setSize( sceneContainer.clientWidth, sceneContainer.clientHeight );
 
-}
-//  window.addEventListener('resize',onWindowResize, false);
+				camera.aspect = sceneContainer.clientWidth / sceneContainer.clientHeight;
+				camera.updateProjectionMatrix();
 
-init();
-animate();
+				// trial
+				// window = window.innerWidth ;
+				// window = window.innerHeight;
+				//end trial
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				// renderer.render( scene, camera );
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				const delta = clock.getDelta();
+
+				controls.update( delta );
+				renderer.render( scene, camera );
+
+			}

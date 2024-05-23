@@ -1,45 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Starter File</title>
-    <link rel="stylesheet" href="css/style.css">
-
-    <!-- use an import map to link to the Three.js CDN -->
-    <script type="importmap">
-      {
+	<head>
+		<title>three.js webgl - lensflares</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="css/main.css">
+       
+       <script type="importmap">
+			{
         "imports": {
           "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
           "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
-        }
-      }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/FirstPersonControls.min.js"></script>
-    <!-- Link to your Javascript file as a type="module", this will execute the file after the HTML is loaded -->
-    <script type="module" src="js/main.js"></script>
+                }
+            }
+        </script>
+        <script type = "module" src="js/main.js"></script>
+		
+	</head>
 
+	<body>
+		<header>
+			<h1>ADHD CT SCAN</h1>
+			<p>
+				Key Board controls:<br>
+				S = Zoom out <br>
+				W = Zoom in  <br>
+				A = Left <br>
+				D = Right <br>
+				R = Up <br>
+				F = Down <br>
+				Q = Right Spin <br>
+				E = Left Spin <br>
+				Mouse = Orbit <br>
 
- 
-    
-</head>
+				<a href="https://chadd.org/" target="_blank">For more information about ADHD
+					<button>Click here</button>
+				  </a>
+			</p>
+			<!-- <image div  id = "ctscan" src ="./textures/ctscan.png"></div> -->
+			<button id="mute-button">Sound ON/ OFF</button>
 
+		<canvas id="gradient-canvas" data-transition-in class="background" />
 
-<body>
-    <header>
-        <h1>Earth's HeadQuarters</h1>
-        <button id="play-button">Play First</button>
-        <!-- <button id="playl-button">Play Last</button> -->
-        <canvas id="gradient-canvas" data-transition-in />
-    </header>
-    <main>
-      <div id="scene-container"></div>
-    </main>
-    <!-- <canvas id="gradient-canvas" data-transition-in /> -->
-    <audio  id= "sound" src="media/ufosound.mp3"></audio>
-    <audio  id= "mix" src="media/earth_mixdown.mp3"></audio>
-    <script src="js/sound.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - lensflares<br/>
+			textures from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a><br/>
+			fly with WASD/RF/QE + mouse
+		</div>
+	    </header>
+	    <main>
 
-  
-</body>
+		<div id="scene-container">
+		<video id = "video" autoplay loop width ="320" height="240"
+	src= "./media/outside.mp4"></video>
+</div>
+	</main>
+
+	
+	</body>
 </html>
